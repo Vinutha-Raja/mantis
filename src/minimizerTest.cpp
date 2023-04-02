@@ -3,7 +3,7 @@
 //
 
 #include "minimizer.h"
-
+#include <vector>
 using namespace std;
 
 int main() {
@@ -12,6 +12,6 @@ int main() {
     scanner.LoadSequence(seq);
     uint64_t *mmp;
     while ((mmp = scanner.NextMinimizer()) != nullptr)
-        printf("%016x\n", *mmp);
+        printf("%016lx\n", *mmp);
     return 0;
 }
