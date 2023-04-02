@@ -6,7 +6,8 @@
 #define MANTIS_CANONICALKMER_H
 
 #include <map>
-
+#include <cstdint>
+#include <string>
 namespace dna {
 
 /////////////// bases /////////////////
