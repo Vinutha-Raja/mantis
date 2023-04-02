@@ -3,10 +3,11 @@
 //
 #include "minimizer.h"
 #include <cassert>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <climits>
 using std::string;
 using std::vector;
 
@@ -25,7 +26,7 @@ using std::vector;
               toggle_mask_(toggle_mask), loaded_ch_(0),
               last_ambig_(0), revcom_version_(revcom_version) {
         if (l_ > (ssize_t) ((sizeof(uint64_t) * 8 - 1) / (dna_ ? BITS_PER_CHAR_DNA : BITS_PER_CHAR_PRO)))
-            errx(EX_SOFTWARE, "l exceeds size limits for minimizer %s scanner",
+            printf( "l exceeds size limits for minimizer %s scanner",
                  dna_ ? "nucleotide" : "protein");
         lmer_mask_ = 1;
         lmer_mask_ <<= (l_ * (dna_ ? BITS_PER_CHAR_DNA : BITS_PER_CHAR_PRO));
