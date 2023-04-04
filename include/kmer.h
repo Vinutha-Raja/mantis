@@ -60,7 +60,7 @@ class Kmer {
 																				 total_kmers,
 																				 bool is_bulk,
 											 //nonstd::optional<std::unordered_map<mantis::KmerHash, uint64_t>> &uniqueKmers);
-											 std::unordered_map<mantis::KmerHash, uint64_t> &uniqueKmers);
+											 std::unordered_map<mantis::KmerHash, uint64_t> &uniqueKmers, uint64_t lmer_size);
 			static std::string generate_random_string(uint64_t len);
 
 	private:

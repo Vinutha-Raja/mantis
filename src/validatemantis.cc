@@ -77,6 +77,7 @@ validate_main ( ValidateOpts& opt )
 	std::string squeakr_file;
 	uint32_t nqf = 0;
 	uint64_t kmer_size;
+    uint64_t lmer_size = opt.l;
 	while (infile >> squeakr_file) {
 		if (!mantis::fs::FileExists(squeakr_file.c_str())) {
 			console->error("Squeakr file {} does not exist.", squeakr_file);
@@ -148,7 +149,7 @@ validate_main ( ValidateOpts& opt )
 																										kmer_size,
 																										total_kmers,
 																										false,
-																										_dummy_uniqueKmers);
+																										_dummy_uniqueKmers, lmer_size);
 	console->info("Total k-mers to query: {}", total_kmers);
 
 	// Query kmers in each experiment CQF

@@ -31,6 +31,7 @@ class QueryOpts {
   std::string output{"samples.output"};
   std::string query_file;
   uint64_t k = 0;
+  uint64_t l = 0;
   uint32_t numThreads = 1;
   bool use_json{false};
   std::shared_ptr<spdlog::logger> console{nullptr};
@@ -45,6 +46,7 @@ class ValidateOpts {
   std::string inlist;
   std::string prefix;
   std::string query_file;
+  uint64_t l = 0;
   std::shared_ptr<spdlog::logger> console{nullptr};
 };
 

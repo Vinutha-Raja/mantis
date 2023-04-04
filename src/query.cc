@@ -162,6 +162,7 @@ int query_main (QueryOpts& opt)
   //CLI::App app("Mantis query");
 
   std::string prefix = opt.prefix;
+  uint64_t lmer_size = opt.l;
   std::string query_file = opt.query_file;
   std::string output_file = opt.output;//{"samples.output"};
   bool use_json = opt.use_json;
@@ -188,7 +189,7 @@ int query_main (QueryOpts& opt)
 																														sample_file,
 																														MANTIS_DBG_IN_MEMORY);
 	uint64_t kmer_size = cdbg.get_cqf()->keybits() / 2;
-  console->info(" 1 Read colored dbg with {} k-mers and {} color classes",
+  console->info("Read colored dbg with {} k-mers and {} color classes",
                 cdbg.get_cqf()->dist_elts(), cdbg.get_num_bitvectors());
 
 	//cdbg.get_cqf()->dump_metadata(); 
@@ -208,53 +209,25 @@ int query_main (QueryOpts& opt)
 	uint32_t seed = 2038074743;
 	uint64_t total_kmers = 0;
     std::unordered_map<mantis::KmerHash, uint64_t> uniqueKmers;
+
+    //Convert Kmers to Lmers
+//    MinimizerScanner scanner(kmer_size, lmer_size, 0, true, 0);
 	mantis::QuerySets multi_kmers = Kmer::parse_kmers(query_file.c_str(),
 																										kmer_size,
 																										total_kmers,
 																										opt.process_in_bulk,
-																										uniqueKmers);
+																										uniqueKmers, lmer_size);
 	console->info("Total k-mers to query: {}", total_kmers);
-    console->info("Number of uniqueKmers to query: {}", uniqueKmers.size());
-    for (auto const &pair: uniqueKmers) {
-        console->info("Kmer: {}, Count: {}", pair.first, pair.second);
-    }
-    console->info("Number of multi_kmers to query: {}", multi_kmers.size());
-
-    //Convert Kmers to Lmers
-    uint64_t lmer_size = 15;
-    MinimizerScanner scanner(kmer_size, lmer_size, 0, true, 0);
-    mantis::QuerySets multi_lmers;
-    std::unordered_map<mantis::KmerHash, uint64_t> uniqueLmers;
-    for (auto const &pair: uniqueKmers) {
-        string seq = Kmer::int_to_str(pair.first, kmer_size);
-        scanner.LoadSequence(seq);
-        uint64_t *mmp = scanner.NextMinimizer();
-        uniqueLmers[*mmp] = pair.second;
-//        console->info("kmer: {}, count: {}", pair.first, pair.second);
-    }
-
-    for(auto element : multi_kmers){
-        std::unordered_set<uint64_t> lmerSet;
-        for (auto it = element.begin(); it != element.end(); ++it) {
-            string seq = Kmer::int_to_str(*it, kmer_size);
-            cout << "kmer: "; cout << Kmer::int_to_str(*it, kmer_size);
-            scanner.LoadSequence(seq);
-            uint64_t *mmp = scanner.NextMinimizer();
-            cout<< "lmer: "<<*mmp<<" lmer str:"<<Kmer::int_to_str(*mmp, lmer_size)<<std::endl;
-            lmerSet.insert(*mmp);
-        }
-        multi_lmers.push_back(lmerSet);
-    }
-
+    
 	std::ofstream opfile(output_file);
 	console->info("Querying the colored dbg.");
 
   if (use_json) {
       // Passing lmers instead of kmers
-    output_results_json(multi_lmers, cdbg, opfile, opt.process_in_bulk, uniqueLmers);
+    output_results_json(multi_kmers, cdbg, opfile, opt.process_in_bulk, uniqueKmers);
   } else {
       // Passing lmers instead of kmers
-    output_results(multi_lmers, cdbg, opfile, opt.process_in_bulk, uniqueLmers);
+    output_results(multi_kmers, cdbg, opfile, opt.process_in_bulk, uniqueKmers);
   }
 	//std::cout << "Writing samples and abundances out." << std::endl;
 	opfile.close();
