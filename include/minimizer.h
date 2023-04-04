@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <string>
-
+#include <vector>
 using namespace std;
 
 const uint64_t DEFAULT_TOGGLE_MASK = 0xe37e28c4271b5a2dULL;

@@ -36,11 +36,25 @@ uint64_t str_to_int(string str)
 	return strint >> 2;
 }
 
+std::string Kmer::int_to_str_lmer(__int128_t kmer, uint64_t kmer_size)
+{
+
+    char BASES[] = {'A', 'C', 'G', 'T'};
+    uint8_t base;
+    std::string str;
+    for (uint32_t i = kmer_size; i > 0; i--) {
+        base = (kmer >> (i*2-2)) & 3ULL;
+        char chr = BASES[base];
+        str.push_back(chr);
+    }
+    return str;
+}
+
 /**
  * Converts a uint64_t to a string of "ACTG"
  * where each character is represented by using only two bits
  */
-string int_to_str(uint64_t kmer, uint64_t kmer_size)
+string Kmer::int_to_str(uint64_t kmer, uint64_t kmer_size)
 {
 	uint8_t base;
 	string str;
