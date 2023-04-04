@@ -213,14 +213,12 @@ int query_main (QueryOpts& opt)
 																										total_kmers,
 																										opt.process_in_bulk,
 																										uniqueKmers);
-	console->info("1 Total k-mers to query: {}", total_kmers);
-    console->info("1 uniqueKmers k-mers to query: {}", uniqueKmers.size());
+	console->info("Total k-mers to query: {}", total_kmers);
+    console->info("Number of uniqueKmers to query: {}", uniqueKmers.size());
     for (auto const &pair: uniqueKmers) {
-        console->info("firsr: {}, second: {}", pair.first, pair.second);
-//        console->info("firsr: {}, second: {}", pair.first, pair.second);
-//        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
+        console->info("Kmer: {}, Count: {}", pair.first, pair.second);
     }
-    console->info("1 multi_kmers k-mers to query: {}", multi_kmers.size());
+    console->info("Number of multi_kmers to query: {}", multi_kmers.size());
 
     //Convert Kmers to Lmers
     uint64_t lmer_size = 15;
@@ -232,9 +230,8 @@ int query_main (QueryOpts& opt)
         scanner.LoadSequence(seq);
         uint64_t *mmp = scanner.NextMinimizer();
         uniqueLmers[*mmp] = pair.second;
-        console->info("kmer: {}, count: {}", pair.first, pair.second);
+//        console->info("kmer: {}, count: {}", pair.first, pair.second);
     }
-
 
     for(auto element : multi_kmers){
         std::unordered_set<uint64_t> lmerSet;
@@ -243,7 +240,7 @@ int query_main (QueryOpts& opt)
             cout << "kmer: "; cout << Kmer::int_to_str(*it, kmer_size);
             scanner.LoadSequence(seq);
             uint64_t *mmp = scanner.NextMinimizer();
-            cout<< "lmer: "<<*mmp<<"lmer str:"<<Kmer::int_to_str(*mmp, lmer_size)<<std::endl;
+            cout<< "lmer: "<<*mmp<<" lmer str:"<<Kmer::int_to_str(*mmp, lmer_size)<<std::endl;
             lmerSet.insert(*mmp);
         }
         multi_lmers.push_back(lmerSet);
@@ -253,8 +250,10 @@ int query_main (QueryOpts& opt)
 	console->info("Querying the colored dbg.");
 
   if (use_json) {
+      // Passing lmers instead of kmers
     output_results_json(multi_lmers, cdbg, opfile, opt.process_in_bulk, uniqueLmers);
   } else {
+      // Passing lmers instead of kmers
     output_results(multi_lmers, cdbg, opfile, opt.process_in_bulk, uniqueLmers);
   }
 	//std::cout << "Writing samples and abundances out." << std::endl;
