@@ -58,7 +58,9 @@ void output_results(mantis::QuerySets& multi_kmers,
         for (auto& kmers : multi_kmers) {
             opfile <<  cnt++ << '\t' << kmers.size() << '\n';
             std::vector<uint64_t> kmerCnt(cdbg.get_num_samples());
+
             for (auto &k : kmers) {
+                cout<<Kmer::int_to_str(k, 21)<< std::endl;
                 if (uniqueKmers[k]) {
                     for (auto experimentId : result[k]) {
                         kmerCnt[experimentId]++;
@@ -76,6 +78,9 @@ void output_results(mantis::QuerySets& multi_kmers,
             //std::sort(kmers.begin(), kmers.end());
             opfile << cnt++ << '\t' << kmers.size() << '\n';
             mantis::QueryResult result = cdbg.find_samples(kmers);
+            for (auto &k : kmers) {
+                cout<<Kmer::int_to_str(k, 21)<< std::endl;
+            }
             for (auto i = 0; i < result.size(); ++i) {
                 if (result[i] > 0)
                     opfile << cdbg.get_sample(i) << '\t' << result[i] << '\n';

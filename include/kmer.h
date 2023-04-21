@@ -47,7 +47,7 @@ class Kmer {
 		}
 		//static uint8_t map_base(char base);
 		static __int128_t str_to_int(std::string str);
-		static std::string int_to_str(__int128_t kmer, uint64_t kmer_size);
+		static std::string int_to_str(uint64_t kmer, uint64_t kmer_size);
 		/* Return the reverse complement of a base */
 		static inline int reverse_complement_base(int x) { return 3 - x; }
 		static __int128_t reverse_complement(__int128_t kmer, uint64_t kmer_size);

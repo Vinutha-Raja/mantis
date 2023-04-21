@@ -40,7 +40,7 @@ uint64_t str_to_int(string str)
  * Converts a uint64_t to a string of "ACTG"
  * where each character is represented by using only two bits
  */
-string int_to_str(uint64_t kmer, uint64_t kmer_size)
+string Kmer::int_to_str(uint64_t kmer, uint64_t kmer_size)
 {
 	uint8_t base;
 	string str;
