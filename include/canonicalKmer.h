@@ -8,6 +8,7 @@
 #include <map>
 #include <cstdint>
 #include <string>
+
 namespace dna {
 
 /////////////// bases /////////////////

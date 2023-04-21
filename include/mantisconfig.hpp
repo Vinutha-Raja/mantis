@@ -10,6 +10,7 @@ namespace mantis{
     constexpr char version[] = "0.2.0";
     constexpr uint32_t index_version = 0;
     constexpr char meta_file_name[] = "/meta_info.json";
+    constexpr char LMER_INDEX_FILE[] = "lmer_index.txt";
     constexpr char CQF_FILE[] = "dbg_cqf.ser";
     constexpr char EQCLASS_FILE[] = "eqclass_rrr.cls";
     constexpr char SAMPLEID_FILE[] = "sampleid.lst";
