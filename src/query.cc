@@ -22,6 +22,7 @@
 #include <bitset>
 #include <cassert>
 #include <fstream>
+#include <list>
 
 #include <time.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@
 #include "CLI/CLI.hpp"
 #include "CLI/Timer.hpp"
 #include "mantisconfig.hpp"
+#include "minimizer.h"
 
 void output_results(mantis::QuerySets& multi_kmers,
 										ColoredDbg<SampleObject<CQF<KeyObject>*>, KeyObject>&
@@ -84,6 +86,75 @@ void output_results(mantis::QuerySets& multi_kmers,
         }
     }
   }
+}
+
+void output_lmer_results(mantis::QuerySets& multi_kmers, std::string samplefile, std::string dbgfile, std::ofstream& opfile, bool is_bulk,
+                    std::unordered_map<mantis::KmerHash, uint64_t> &uniqueKmers) {
+    mantis::QueryResults qres;
+    std::ifstream infile(samplefile);
+    std::ifstream indexfile(dbgfile);
+
+    // Reading File ID mapping function
+    std::unordered_map<int, std::string> fileIDMapping;
+    std::string line;
+    while (std::getline(infile, line)) {
+        size_t pos = line.find(':');
+        std::string value = line.substr(0, pos);
+        int key = std::stoi(line.substr(pos + 1));
+        fileIDMapping[key] = value;
+    }
+
+    // Reading the mantis index file function
+    std::unordered_map<uint64_t , std::list<int>> lmerIndex;
+
+    while (std::getline(indexfile, line)) {
+        std::stringstream ss(line);
+        std::string key;
+        std::getline(ss, key, ':');
+        uint64_t lmer = Kmer::str_to_int(key);
+//        cout<< "map"<< key << " " << lmer <<std::endl;
+
+        int id;
+        while (ss >> id) {
+            lmerIndex[lmer].push_back(id);
+        }
+    }
+
+    uint32_t cnt= 0;
+    {
+        CLI::AutoTimer timer{"Query time ", CLI::Timer::Big};
+        if (is_bulk) {
+
+            for (auto& kmers : multi_kmers) {
+                opfile <<  cnt++ << '\t' << kmers.size() << '\n';
+                std::unordered_map<int, int> kmerCnt;
+                for (auto &k : kmers) {
+                        for (auto experimentId : lmerIndex[k]) {
+                            kmerCnt[experimentId]++;
+                        }
+                }
+                for (auto i=0; i<kmerCnt.size(); ++i) {
+                    if (kmerCnt[i] > 0)
+                        opfile << fileIDMapping[i] << '\t' << kmerCnt[i] << '\n';
+                }
+            }
+        } else {
+            for (auto &kmers : multi_kmers) {
+                opfile << cnt++ << '\t' << kmers.size() << '\n';
+                std::unordered_map<int, int> kmerCnt;
+                for (auto &k : kmers) {
+//                    cout << k << " " << Kmer::int_to_str(k, 7) << endl;
+                    for (auto experimentId : lmerIndex[k]) {
+                        kmerCnt[experimentId]++;
+                    }
+                }
+                for (auto i=0; i<kmerCnt.size(); ++i) {
+                    if (kmerCnt[i] > 0)
+                        opfile << fileIDMapping[i] << '\t' << kmerCnt[i] << '\n';
+                }
+            }
+        }
+    }
 }
 
 void output_results_json(mantis::QuerySets& multi_kmers,
@@ -161,6 +232,8 @@ int query_main (QueryOpts& opt)
   //CLI::App app("Mantis query");
 
   std::string prefix = opt.prefix;
+  uint64_t lmer_size = opt.l;
+  uint64_t kmer_size = opt.k;
   std::string query_file = opt.query_file;
   std::string output_file = opt.output;//{"samples.output"};
   bool use_json = opt.use_json;
@@ -177,50 +250,32 @@ int query_main (QueryOpts& opt)
   spdlog::logger* console = opt.console.get();
 	console->info("Reading colored dbg from disk.");
 
-	std::string dbg_file(prefix + mantis::CQF_FILE);
+	std::string dbg_file(prefix + mantis::LMER_INDEX_FILE);
 	std::string sample_file(prefix + mantis::SAMPLEID_FILE);
-	std::vector<std::string> eqclass_files = mantis::fs::GetFilesExt(prefix.c_str(),
-                                                                   mantis::EQCLASS_FILE);
-
-	ColoredDbg<SampleObject<CQF<KeyObject>*>, KeyObject> cdbg(dbg_file,
-																														eqclass_files,
-																														sample_file,
-																														MANTIS_DBG_IN_MEMORY);
-	uint64_t kmer_size = cdbg.get_cqf()->keybits() / 2;
-  console->info("Read colored dbg with {} k-mers and {} color classes",
-                cdbg.get_cqf()->dist_elts(), cdbg.get_num_bitvectors());
-
-	//cdbg.get_cqf()->dump_metadata(); 
-	//CQF<KeyObject> cqf(query_file, false);
-	//CQF<KeyObject>::Iterator it = cqf.begin(1);
-	//mantis::QuerySet input_kmers;
-	//do {
-		//KeyObject k = *it;
-		//input_kmers.insert(k.key);
-		//++it;
-	//} while (!it.done());
-
-	//mantis::QuerySets multi_kmers;
-	//multi_kmers.push_back(input_kmers);
 
 	console->info("Reading query kmers from disk.");
 	uint32_t seed = 2038074743;
 	uint64_t total_kmers = 0;
     std::unordered_map<mantis::KmerHash, uint64_t> uniqueKmers;
+
+    //Convert Kmers to Lmers
+//    MinimizerScanner scanner(kmer_size, lmer_size, 0, true, 0);
 	mantis::QuerySets multi_kmers = Kmer::parse_kmers(query_file.c_str(),
 																										kmer_size,
 																										total_kmers,
 																										opt.process_in_bulk,
-																										uniqueKmers);
+																										uniqueKmers, lmer_size);
 	console->info("Total k-mers to query: {}", total_kmers);
-
+    
 	std::ofstream opfile(output_file);
 	console->info("Querying the colored dbg.");
 
   if (use_json) {
-    output_results_json(multi_kmers, cdbg, opfile, opt.process_in_bulk, uniqueKmers);
+      // Passing lmers instead of kmers
+//    output_results_json(multi_kmers, cdbg, opfile, opt.process_in_bulk, uniqueKmers);
   } else {
-    output_results(multi_kmers, cdbg, opfile, opt.process_in_bulk, uniqueKmers);
+      // Passing lmers instead of kmers
+      output_lmer_results(multi_kmers, sample_file, dbg_file,  opfile, opt.process_in_bulk, uniqueKmers);
   }
 	//std::cout << "Writing samples and abundances out." << std::endl;
 	opfile.close();

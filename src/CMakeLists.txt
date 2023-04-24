@@ -17,7 +17,8 @@ add_library(mantis_core STATIC
   		gqf/gqf.c
   		gqf/gqf_file.c
   		gqf/hashutil.c
-  		gqf/partitioned_counter.c)
+  		gqf/partitioned_counter.c
+		minimizer.cc)
 
 set(MANTIS_DEBUG_CFLAGS "${MANTIS_C_FLAGS};-g")
 set(MANTIS_DEBUG_CXXFLAGS "${MANTIS_CXX_FLAGS};-g")

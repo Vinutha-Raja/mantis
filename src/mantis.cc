@@ -125,6 +125,7 @@ int main ( int argc, char *argv[] ) {
                      % "Use color classes as the color info representation instead of MST",
                      option("-j", "--json").set(qopt.use_json) % "Write the output in JSON format",
                      option("-k", "--kmer") & value("kmer", qopt.k) % "size of k for kmer.",
+                     option("-l", "--lmer") & value("lmer", qopt.l) % "size of l for lmer.",
                      required("-p", "--input-prefix") & value(ensure_dir_exists, "query_prefix", qopt.prefix) % "Prefix of input files.",
                      option("-o", "--output") & value("output_file", qopt.output) % "Where to write query output.",
                      value(ensure_file_exists, "query", qopt.query_file) % "Prefix of input files."
@@ -134,6 +135,7 @@ int main ( int argc, char *argv[] ) {
                      command("validate").set(selected, mode::validate),
                      required("-i", "--input-list") & value(ensure_file_exists, "input_list", vopt.inlist) % "file containing list of input filters",
                      required("-p", "--input-prefix") & value(ensure_dir_exists, "dbg_prefix", vopt.prefix) % "Directory containing the mantis dbg.",
+                     option("-l", "--lmer") & value("lmer", qopt.l) % "size of l for lmer.",
                      value(ensure_file_exists, "query", vopt.query_file) % "Query file."
                      );
     auto stats_mode = (
