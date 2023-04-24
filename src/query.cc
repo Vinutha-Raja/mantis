@@ -94,7 +94,7 @@ void output_lmer_results(mantis::QuerySets& multi_kmers, std::string samplefile,
     std::ifstream infile(samplefile);
     std::ifstream indexfile(dbgfile);
 
-    // TODO: move to reading File ID mapping function
+    // Reading File ID mapping function
     std::unordered_map<int, std::string> fileIDMapping;
     std::string line;
     while (std::getline(infile, line)) {
@@ -104,7 +104,7 @@ void output_lmer_results(mantis::QuerySets& multi_kmers, std::string samplefile,
         fileIDMapping[key] = value;
     }
 
-    // TODO: move to reading the mantis index file function
+    // Reading the mantis index file function
     std::unordered_map<uint64_t , std::list<int>> lmerIndex;
 
     while (std::getline(indexfile, line)) {
@@ -252,29 +252,6 @@ int query_main (QueryOpts& opt)
 
 	std::string dbg_file(prefix + mantis::LMER_INDEX_FILE);
 	std::string sample_file(prefix + mantis::SAMPLEID_FILE);
-//	std::vector<std::string> eqclass_files = mantis::fs::GetFilesExt(prefix.c_str(),
-//                                                                   mantis::EQCLASS_FILE);
-
-//	ColoredDbg<SampleObject<CQF<KeyObject>*>, KeyObject> cdbg(dbg_file,
-//																														eqclass_files,
-//																														sample_file,
-//																														MANTIS_DBG_IN_MEMORY);
-//	uint64_t kmer_size = cdbg.get_cqf()->keybits() / 2;
-//  console->info("Read colored dbg with {} k-mers and {} color classes",
-//                cdbg.get_cqf()->dist_elts(), cdbg.get_num_bitvectors());
-
-	//cdbg.get_cqf()->dump_metadata(); 
-	//CQF<KeyObject> cqf(query_file, false);
-	//CQF<KeyObject>::Iterator it = cqf.begin(1);
-	//mantis::QuerySet input_kmers;
-	//do {
-		//KeyObject k = *it;
-		//input_kmers.insert(k.key);
-		//++it;
-	//} while (!it.done());
-
-	//mantis::QuerySets multi_kmers;
-	//multi_kmers.push_back(input_kmers);
 
 	console->info("Reading query kmers from disk.");
 	uint32_t seed = 2038074743;

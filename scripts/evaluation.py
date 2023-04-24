@@ -24,10 +24,3 @@ kmer_result = read_result_file(kmer_result_file, 0.0)
 print(kmer_result)
 lmer_result = read_result_file(lmer_result_file, 0.0)
 print(lmer_result)
-
-
-
-
-
-
-

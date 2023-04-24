@@ -118,69 +118,6 @@ start_read:
                     if (uniqueKmers.find(*mmp) == uniqueKmers.end())
                         uniqueKmers[*mmp] = 0;
             }
-
-//			uint64_t first = 0;
-//			uint64_t first_rev = 0;
-//			uint64_t item = 0;
-//			for(uint32_t i = 0; i < kmer_size; i++) { //First kmer
-//				uint8_t curr = Kmer::map_base(read[i]);
-//				if (curr > DNA_MAP::G) { // 'N' is encountered
-//					if (i + 1 < read.length())
-//						read = read.substr(i + 1, read.length());
-//					else
-//						goto next_read;
-//					goto start_read;
-//				}
-//				first = first | curr;
-//				first = first << 2;
-//			}
-//			first = first >> 2;
-//			first_rev = Kmer::reverse_complement(first, kmer_size);
-//
-//			//cout << "kmer: "; cout << int_to_str(first);
-//			//cout << " reverse-comp: "; cout << int_to_str(first_rev) << endl;
-//
-//			if (Kmer::compare_kmers(first, first_rev))
-//				item = first;
-//			else
-//				item = first_rev;
-//
-//
-//			kmers_set.insert(item);
-//			if (is_bulk)
-//				if (uniqueKmers.find(item) == uniqueKmers.end())
-//					uniqueKmers[item] = 0;
-//
-//			uint64_t next = (first << 2) & BITMASK(2*kmer_size);
-//			uint64_t next_rev = first_rev >> 2;
-//
-//			for(uint32_t i=kmer_size; i<read.length(); i++) { //next kmers
-//				//cout << "K: " << read.substr(i-K+1,K) << endl;
-//				uint8_t curr = Kmer::map_base(read[i]);
-//				if (curr > DNA_MAP::G) { // 'N' is encountered
-//					if (i + 1 < read.length())
-//						read = read.substr(i + 1, read.length());
-//					else
-//						goto next_read;
-//					goto start_read;
-//				}
-//				next |= curr;
-//				uint64_t tmp = Kmer::reverse_complement_base(curr);
-//				tmp <<= (kmer_size*2-2);
-//				next_rev = next_rev | tmp;
-//				if (Kmer::compare_kmers(next, next_rev))
-//					item = next;
-//				else
-//					item = next_rev;
-//
-//				kmers_set.insert(item);
-//				if (is_bulk)
-//					if (uniqueKmers.find(item) == uniqueKmers.end())
-//						uniqueKmers[item] = 0;
-//
-//				next = (next << 2) & BITMASK(2*kmer_size);
-//				next_rev = next_rev >> 2;
-//			}
 		}
 next_read:
 		total_kmers += kmers_set.size();
